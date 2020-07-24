@@ -37,33 +37,42 @@ public class Kalahah {
     public void move(final Integer pitId) {
         if (isValidPit(pitId)) {
             if (pitHasItems(pitId)) {
-                int pitStones = this.status.get(pitId);
-                //pickup the stones
-                this.status.put(pitId, 0);
-                switch (this.turn) {
-                    case SOUTH:
-                        //place stones counter-clockwise
-                        int pitDestination = pitId;
-                        //do this while I have stones in my hand
-                        while (pitStones > 0) {
-                            pitDestination = pitDestination % 14 + 1;
-                            //only on my valid pits
-                            if (pitDestination != KALAH_PLAYER_NORTH)
-                                this.status.put(pitDestination, this.status.get(pitDestination) + 1);
-                            if (pitStones == 1) {
-                                processEmptyPitToPullOpponentStones(pitDestination, this.turn);
-                            }
-                            pitStones--;
+                if (isValidToPickStonesFromPit(pitId, turn)) {
+                    int pitStones = this.status.get(pitId);
+                    //pickup the stones
+                    this.status.put(pitId, 0);
+
+                    //place stones counter-clockwise
+                    int pitDestination = pitId;
+                    //do this while I have stones in my hand
+                    while (pitStones > 0) {
+                        pitDestination = pitDestination % 14 + 1;
+                        //only on my valid pits
+                        if ((turn.equals(Player.SOUTH) && pitDestination != KALAH_PLAYER_NORTH) ||
+                                (turn.equals(Player.NORTH) && pitDestination != KALAH_PLAYER_SOUTH))
+                            this.status.put(pitDestination, this.status.get(pitDestination) + 1);
+
+                        if (pitStones == 1) {
+                            processEmptyPitToPullOpponentStones(pitDestination, this.turn);
                         }
-                        // rule, if last stone is placed on kalah you have another turn
+                        pitStones--;
+                    }
+                    // rule, if last stone is placed on kalah you have another turn
+                    if (turn.equals(Player.SOUTH)) {
                         if (isLastStonePlacedOnKalah(pitDestination, this.turn)) {
                             this.turn = Player.SOUTH;
                         } else {
                             this.turn = Player.NORTH;
                         }
-                        break;
-                    case NORTH:
-                        break;
+                    } else if (turn.equals(Player.NORTH)) {
+                        if (isLastStonePlacedOnKalah(pitDestination, this.turn)) {
+                            this.turn = Player.NORTH;
+                        } else {
+                            this.turn = Player.SOUTH;
+                        }
+                    }
+                } else {
+                    throw new RuntimeException("Player " + turn.toString() + " cannot move pieces from this pit");
                 }
             } else {
                 throw new RuntimeException("Pit doesn't have items");
@@ -71,6 +80,11 @@ public class Kalahah {
         } else {
             throw new IllegalArgumentException("Illegal pitId: " + pitId);
         }
+    }
+
+    public boolean isValidToPickStonesFromPit(final Integer pitId, final Player turn) {
+        return (turn.equals(Player.SOUTH) && pitId >= 1 && pitId <= 6) ||
+                (turn.equals(Player.NORTH) && pitId >= 8 && pitId <= 13);
     }
 
     public boolean isValidPit(final Integer pitId) {

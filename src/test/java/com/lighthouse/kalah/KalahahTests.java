@@ -10,11 +10,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class KalahahTests {
 
-
-    public void setup() {
-
-    }
-
     @Test
     public void setupBoard() {
         Kalahah board = new Kalahah(6);
@@ -35,18 +30,21 @@ public class KalahahTests {
         //   0  7  7  7  7  7
         //   1  2  3  4  5  6
         Kalahah board = new Kalahah(6);
-        try {
-            board.move(1);
-            assertEquals(0, board.getStatus().get(1));
-            assertEquals(7, board.getStatus().get(2));
-            assertEquals(7, board.getStatus().get(3));
-            assertEquals(7, board.getStatus().get(4));
-            assertEquals(7, board.getStatus().get(5));
-            assertEquals(7, board.getStatus().get(6));
-            assertEquals(1, board.getStatus().get(7));
-        } catch (Exception ex) {
-
-        }
+        board.move(1);
+        assertEquals(0, board.getStatus().get(1));
+        assertEquals(7, board.getStatus().get(2));
+        assertEquals(7, board.getStatus().get(3));
+        assertEquals(7, board.getStatus().get(4));
+        assertEquals(7, board.getStatus().get(5));
+        assertEquals(7, board.getStatus().get(6));
+        assertEquals(1, board.getStatus().get(7));
+        assertEquals(6, board.getStatus().get(8));
+        assertEquals(6, board.getStatus().get(9));
+        assertEquals(6, board.getStatus().get(10));
+        assertEquals(6, board.getStatus().get(11));
+        assertEquals(6, board.getStatus().get(12));
+        assertEquals(6, board.getStatus().get(13));
+        assertEquals(0, board.getStatus().get(14));
     }
 
     @Test
@@ -59,6 +57,70 @@ public class KalahahTests {
             Kalahah board = new Kalahah(6);
             board.move(Kalahah.KALAH_PLAYER_SOUTH);
         });
+    }
+
+    @Test
+    public void invalidPitIdMoveForSouthTurn() {
+        assertThrows(RuntimeException.class, () -> {
+            Kalahah board = new Kalahah(6);
+            board.move(11);
+        });
+    }
+
+//    @Test
+//    public void invalidPitIdMoveForNorthTurn() {
+//        assertThrows(RuntimeException.class, () -> {
+//            Kalahah board = new Kalahah(6);
+//            board.move(11);
+//        });
+//    }
+
+    @Test
+    public void invalidPitMoveAndSouthGetsAnotherTurn() {
+        Kalahah board = new Kalahah(6);
+        //  13 12 11 10  9  8
+        //   6  6  6  6  6  6
+        //14 0              1 7
+        //   0  7  7  7  7  7
+        //   1  2  3  4  5  6
+        board.move(1); //south player
+        assertEquals(0, board.getStatus().get(1));
+        assertEquals(7, board.getStatus().get(2));
+        assertEquals(7, board.getStatus().get(3));
+        assertEquals(7, board.getStatus().get(4));
+        assertEquals(7, board.getStatus().get(5));
+        assertEquals(7, board.getStatus().get(6));
+        assertEquals(1, board.getStatus().get(7));
+        assertEquals(6, board.getStatus().get(8));
+        assertEquals(6, board.getStatus().get(9));
+        assertEquals(6, board.getStatus().get(10));
+        assertEquals(6, board.getStatus().get(11));
+        assertEquals(6, board.getStatus().get(12));
+        assertEquals(6, board.getStatus().get(13));
+        assertEquals(0, board.getStatus().get(14));
+        assertThrows(RuntimeException.class, () -> {
+            board.move(11); // move pieces from north player when still south turn
+        });
+        //  13 12 11 10  9  8
+        //   6  6  6  6  7  7
+        //14 0              2 7
+        //   0  0  8  8  8  8
+        //   1  2  3  4  5  6
+        board.move(2);
+        assertEquals(0, board.getStatus().get(1));
+        assertEquals(0, board.getStatus().get(2));
+        assertEquals(8, board.getStatus().get(3));
+        assertEquals(8, board.getStatus().get(4));
+        assertEquals(8, board.getStatus().get(5));
+        assertEquals(8, board.getStatus().get(6));
+        assertEquals(2, board.getStatus().get(7));
+        assertEquals(7, board.getStatus().get(8));
+        assertEquals(7, board.getStatus().get(9));
+        assertEquals(6, board.getStatus().get(10));
+        assertEquals(6, board.getStatus().get(11));
+        assertEquals(6, board.getStatus().get(12));
+        assertEquals(6, board.getStatus().get(13));
+        assertEquals(0, board.getStatus().get(14));
     }
 
     @Test
