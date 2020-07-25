@@ -173,32 +173,11 @@ public class KalahahTests {
         assertEquals(13, board.getStatus().get(7));
         assertEquals(6, board.getStatus().get(8));
         assertEquals(0, board.getStatus().get(9));
-
-    }
-
-    @Test
-    public void captureStonesFromEmptyCupTwo() {
-
-    }
-
-    @Test
-    public void captureStonesFromEmptyCupThree() {
-
-    }
-
-    @Test
-    public void captureStonesFromEmptyCupFour() {
-
-    }
-
-    @Test
-    public void captureStonesFromEmptyCupFive() {
-
-    }
-
-    @Test
-    public void captureStonesFromEmptyCupSix() {
-
+        assertEquals(6, board.getStatus().get(10));
+        assertEquals(6, board.getStatus().get(11));
+        assertEquals(6, board.getStatus().get(12));
+        assertEquals(6, board.getStatus().get(13));
+        assertEquals(2, board.getStatus().get(14));
     }
 
     @Test
@@ -208,7 +187,55 @@ public class KalahahTests {
 
     @Test
     public void endOfGameGetStonesToPlayerX() {
+        // before
+        //  13 12 11 10  9  8
+        //   4  6  6  6  6  6
+        //14 2             35 7
+        //   0  0  0  0  0  6
+        //   1  2  3  4  5  6
 
+        // after move
+        //  13 12 11 10  9  8
+        //   6  7  7  7  7  7
+        //14 2             36 7
+        //   0  0  0  0  0  0
+        //   1  2  3  4  5  6
+
+        // after pulling all stones
+        //  13 12 11 10  9  8
+        //   0  0  0  0  0  0
+        //14 43             36 7
+        //   0  0  0  0  0  0
+        //   1  2  3  4  5  6
+
+        Kalahah board = new Kalahah(6);
+        ConcurrentHashMap<Integer, Integer> tempBoard = board.getStatus();
+        tempBoard.put(1, 0);
+        tempBoard.put(2, 0);
+        tempBoard.put(3, 0);
+        tempBoard.put(4, 0);
+        tempBoard.put(5, 0);
+        tempBoard.put(7, 35);
+        tempBoard.put(14, 2);
+        board.setStatus(tempBoard);
+        board.move(6);
+        assertEquals(0, board.getStatus().get(1));
+        assertEquals(0, board.getStatus().get(2));
+        assertEquals(0, board.getStatus().get(3));
+        assertEquals(0, board.getStatus().get(4));
+        assertEquals(0, board.getStatus().get(5));
+        assertEquals(0, board.getStatus().get(6));
+        assertEquals(36, board.getStatus().get(7));
+        assertEquals(0, board.getStatus().get(8));
+        assertEquals(0, board.getStatus().get(9));
+        assertEquals(0, board.getStatus().get(10));
+        assertEquals(0, board.getStatus().get(11));
+        assertEquals(0, board.getStatus().get(12));
+        assertEquals(0, board.getStatus().get(13));
+        assertEquals(43, board.getStatus().get(14));
+        assertThrows(RuntimeException.class,()->{
+            board.move(1);
+        });
     }
 
 }

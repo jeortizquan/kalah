@@ -35,51 +35,98 @@ public class Kalahah {
     }
 
     public void move(final Integer pitId) {
-        if (isValidPit(pitId)) {
-            if (pitHasItems(pitId)) {
-                if (isValidToPickStonesFromPit(pitId, turn)) {
-                    int pitStones = this.status.get(pitId);
-                    //pickup the stones
-                    this.status.put(pitId, 0);
+        if(gameHasEnded() == GameStatus.IN_PROGRESS) {
+            if (isValidPit(pitId)) {
+                if (pitHasItems(pitId)) {
+                    if (isValidToPickStonesFromPit(pitId, turn)) {
+                        int pitStones = this.status.get(pitId);
+                        //pickup the stones
+                        this.status.put(pitId, 0);
+                        //place stones counter-clockwise
+                        int pitDestination = pitId;
+                        //do this while I have stones in my hand
+                        while (pitStones > 0) {
+                            pitDestination = pitDestination % 14 + 1;
+                            //only on my valid pits
+                            if ((turn.equals(Player.SOUTH) && pitDestination != KALAH_PLAYER_NORTH) ||
+                                    (turn.equals(Player.NORTH) && pitDestination != KALAH_PLAYER_SOUTH))
+                                this.status.put(pitDestination, this.status.get(pitDestination) + 1);
 
-                    //place stones counter-clockwise
-                    int pitDestination = pitId;
-                    //do this while I have stones in my hand
-                    while (pitStones > 0) {
-                        pitDestination = pitDestination % 14 + 1;
-                        //only on my valid pits
-                        if ((turn.equals(Player.SOUTH) && pitDestination != KALAH_PLAYER_NORTH) ||
-                                (turn.equals(Player.NORTH) && pitDestination != KALAH_PLAYER_SOUTH))
-                            this.status.put(pitDestination, this.status.get(pitDestination) + 1);
-
-                        if (pitStones == 1) {
-                            processEmptyPitToPullOpponentStones(pitDestination, this.turn);
+                            if (pitStones == 1) {
+                                processEmptyPitToPullOpponentStones(pitDestination, this.turn);
+                            }
+                            pitStones--;
                         }
-                        pitStones--;
-                    }
-                    // rule, if last stone is placed on kalah you have another turn
-                    if (turn.equals(Player.SOUTH)) {
-                        if (isLastStonePlacedOnKalah(pitDestination, this.turn)) {
-                            this.turn = Player.SOUTH;
-                        } else {
-                            this.turn = Player.NORTH;
+                        // rule, if last stone is placed on kalah you have another turn
+                        if (turn.equals(Player.SOUTH)) {
+                            if (isLastStonePlacedOnKalah(pitDestination, this.turn)) {
+                                this.turn = Player.SOUTH;
+                            } else {
+                                this.turn = Player.NORTH;
+                            }
+                        } else if (turn.equals(Player.NORTH)) {
+                            if (isLastStonePlacedOnKalah(pitDestination, this.turn)) {
+                                this.turn = Player.NORTH;
+                            } else {
+                                this.turn = Player.SOUTH;
+                            }
                         }
-                    } else if (turn.equals(Player.NORTH)) {
-                        if (isLastStonePlacedOnKalah(pitDestination, this.turn)) {
-                            this.turn = Player.NORTH;
-                        } else {
-                            this.turn = Player.SOUTH;
+                        // rule, The game is over as soon as one of the sides run out of stones
+                        switch (gameHasEnded()) {
+                            case SOUTH_FINISHED:
+                                moveRemainingStonesToKalah(KALAH_PLAYER_NORTH);
+                                break;
+                            case NORTH_FINISHED:
+                                moveRemainingStonesToKalah(KALAH_PLAYER_SOUTH);
+                                break;
                         }
+                    } else {
+                        throw new RuntimeException("Player " + turn.toString() + " cannot move pieces from this pit");
                     }
                 } else {
-                    throw new RuntimeException("Player " + turn.toString() + " cannot move pieces from this pit");
+                    throw new RuntimeException("Pit doesn't have items");
                 }
             } else {
-                throw new RuntimeException("Pit doesn't have items");
+                throw new IllegalArgumentException("Illegal pitId: " + pitId);
             }
         } else {
-            throw new IllegalArgumentException("Illegal pitId: " + pitId);
+            throw new RuntimeException("Game has ended, no more moves!");
         }
+    }
+
+    private void moveRemainingStonesToKalah(Integer pitId) {
+        if (pitId == KALAH_PLAYER_NORTH) {
+            int northStones = 0;
+            //pickup the stones
+            for (int n = 8; n <= 13; n++) {
+                northStones += this.status.get(n);
+                this.status.put(n, 0);
+            }
+            this.status.put(KALAH_PLAYER_NORTH, this.status.get(KALAH_PLAYER_NORTH) + northStones);
+
+        } else if (pitId == KALAH_PLAYER_SOUTH) {
+            int southStones = 0;
+            //pickup the stones
+            for (int s = 1; s <= 6; s++) {
+                southStones += this.status.get(s);
+                this.status.put(s, 0);
+            }
+            this.status.put(KALAH_PLAYER_SOUTH, this.status.get(KALAH_PLAYER_SOUTH) + southStones);
+        }
+    }
+
+    private GameStatus gameHasEnded() {
+        int southEmpty = 0;
+        int northEmpty = 0;
+        for (int s = 1; s <= 6; s++)
+            southEmpty += this.status.get(s);
+        for (int n = 8; n <= 13; n++)
+            northEmpty += this.status.get(n);
+        if (southEmpty == 0)
+            return GameStatus.SOUTH_FINISHED;
+        if (northEmpty == 0)
+            return GameStatus.NORTH_FINISHED;
+        return GameStatus.IN_PROGRESS;
     }
 
     public boolean isValidToPickStonesFromPit(final Integer pitId, final Player turn) {
