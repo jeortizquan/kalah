@@ -1,4 +1,4 @@
-## Endless Games Kalah 
+## Endless Games - Kalah 
 #### Introduction
 This is a *Java RESTful Web Service* that runs a game of 6-stone Kalah. 
 Kalah is played on a board with two rows of 6 holes and two stores, called *kalahah*. The two players (North
@@ -40,4 +40,21 @@ Response:
 ```
 HTTP code: 200 Response Body: {"id":"1234","url":"http://<host>:<port>/games/1234","status":{"1":"4","2":"4","3":"4","4":"4","5":"4","6":"4","7":"0","8":"4"," 9":"4","10":"4","11":"4","12":"4","13":"4","14":"0"}} 
 status: json object key-value, where key is the pitId and value is the number of stones in the pit 
+```
+3. Run API:
+
+Windows
+```
+mvnw spring-boot:run
+```
+
+MacOS/Linux
+```
+./mvnw spring-boot:run
+```
+
+4. Swagger
+You can use swagger UI to tryout the API
+```
+http://localhost:8080/swagger-ui.html
 ```

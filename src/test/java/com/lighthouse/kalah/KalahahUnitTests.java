@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class KalahahTests {
+public class KalahahUnitTests {
 
     @Test
     public void setupBoard() {
@@ -142,7 +142,7 @@ public class KalahahTests {
 
     //you can steal stones in front of you from empty spots, and you take the opponent stones to your kalah.
     @Test
-    public void captureStonesFromEmptyCupOne() {
+    public void captureStonesFromEmptyCup() {
         // before
         //  13 12 11 10  9  8
         //   6  6  6  6  6  6
@@ -181,8 +181,42 @@ public class KalahahTests {
     }
 
     @Test
-    public void moreStonesThanSixDoNotFillOpponentKalah() {
+    public void moreThanSixStonesDoNotFillOpponentsKalahah() {
+        // before  <---
+        //  13 12 11 10  9  8
+        //   6  6  6  6  6  6
+        //14 0              0 7
+        //   6  3  3 12  6  6
+        //   1  2  3  4  5  6
+        // --->
 
+        // after
+        //  13 12 11 10  9  8
+        //   7  7  7  7  7  7
+        //14 0              1 7
+        //   7  4  4  0  7  7
+        //   1  2  3  4  5  6
+        Kalahah board = new Kalahah(6);
+        ConcurrentHashMap<Integer, Integer> tempBoard = board.getStatus();
+        tempBoard.put(2, 3);
+        tempBoard.put(3, 3);
+        tempBoard.put(4, 12);
+        board.setStatus(tempBoard);
+        board.move(4);
+        assertEquals(7, board.getStatus().get(1));
+        assertEquals(4, board.getStatus().get(2));
+        assertEquals(4, board.getStatus().get(3));
+        assertEquals(0, board.getStatus().get(4));
+        assertEquals(7, board.getStatus().get(5));
+        assertEquals(7, board.getStatus().get(6));
+        assertEquals(1, board.getStatus().get(7));
+        assertEquals(7, board.getStatus().get(8));
+        assertEquals(7, board.getStatus().get(9));
+        assertEquals(7, board.getStatus().get(10));
+        assertEquals(7, board.getStatus().get(11));
+        assertEquals(7, board.getStatus().get(12));
+        assertEquals(7, board.getStatus().get(13));
+        assertEquals(0, board.getStatus().get(14));
     }
 
     @Test
@@ -233,9 +267,6 @@ public class KalahahTests {
         assertEquals(0, board.getStatus().get(12));
         assertEquals(0, board.getStatus().get(13));
         assertEquals(43, board.getStatus().get(14));
-        assertThrows(RuntimeException.class,()->{
-            board.move(1);
-        });
+        assertThrows(RuntimeException.class, () -> board.move(1));
     }
-
 }

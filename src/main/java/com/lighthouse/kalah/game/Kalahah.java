@@ -1,28 +1,33 @@
 package com.lighthouse.kalah.game;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Kalahah {
 
-    private Long gameId;
-    private Integer stones;
-    private Player turn;
-    private ConcurrentHashMap<Integer, Integer> status;
     public static final Integer KALAH_PLAYER_SOUTH = 7;
     public static final Integer KALAH_PLAYER_NORTH = 14;
+    public static final int GAMES_ORIGIN = 1000;
+    public static final int GAMES_LIMIT = 10000;
+
+    private final Integer stones;
+    private Integer gameId;
+    private Player turn;
+    private ConcurrentHashMap<Integer, Integer> status;
 
     public Kalahah(final Integer stones) {
         this.stones = stones;
         this.turn = Player.SOUTH;
         this.status = new ConcurrentHashMap<>();
+        this.setGameId(ThreadLocalRandom.current().nextInt(GAMES_ORIGIN, GAMES_LIMIT));
         initStonesBoard(this.status, this.stones);
     }
 
-    public Long getGameId() {
+    public Integer getGameId() {
         return gameId;
     }
 
-    public void setGameId(final Long gameId) {
+    public void setGameId(final Integer gameId) {
         this.gameId = gameId;
     }
 
@@ -35,7 +40,7 @@ public class Kalahah {
     }
 
     public void move(final Integer pitId) {
-        if(gameHasEnded() == GameStatus.IN_PROGRESS) {
+        if (gameHasEnded() == KalahahStatus.IN_PROGRESS) {
             if (isValidPit(pitId)) {
                 if (pitHasItems(pitId)) {
                     if (isValidToPickStonesFromPit(pitId, turn)) {
@@ -47,14 +52,18 @@ public class Kalahah {
                         //do this while I have stones in my hand
                         while (pitStones > 0) {
                             pitDestination = pitDestination % 14 + 1;
+
+                            boolean wasEmpty = isEmptyPit(pitDestination);
                             //only on my valid pits
                             if ((turn.equals(Player.SOUTH) && pitDestination != KALAH_PLAYER_NORTH) ||
                                     (turn.equals(Player.NORTH) && pitDestination != KALAH_PLAYER_SOUTH))
                                 this.status.put(pitDestination, this.status.get(pitDestination) + 1);
-
-                            if (pitStones == 1) {
-                                processEmptyPitToPullOpponentStones(pitDestination, this.turn);
+                            else
+                                pitStones++;
+                            if (pitStones == 1 && wasEmpty) {
+                                processLastStoneNEmptyPitToPullOpponentStones(pitDestination, this.turn);
                             }
+
                             pitStones--;
                         }
                         // rule, if last stone is placed on kalah you have another turn
@@ -87,7 +96,7 @@ public class Kalahah {
                     throw new RuntimeException("Pit doesn't have items");
                 }
             } else {
-                throw new IllegalArgumentException("Illegal pitId: " + pitId);
+                throw new IllegalArgumentException("Invalid pitId: " + pitId+ " this is a Kalahah");
             }
         } else {
             throw new RuntimeException("Game has ended, no more moves!");
@@ -115,7 +124,7 @@ public class Kalahah {
         }
     }
 
-    private GameStatus gameHasEnded() {
+    private KalahahStatus gameHasEnded() {
         int southEmpty = 0;
         int northEmpty = 0;
         for (int s = 1; s <= 6; s++)
@@ -123,10 +132,10 @@ public class Kalahah {
         for (int n = 8; n <= 13; n++)
             northEmpty += this.status.get(n);
         if (southEmpty == 0)
-            return GameStatus.SOUTH_FINISHED;
+            return KalahahStatus.SOUTH_FINISHED;
         if (northEmpty == 0)
-            return GameStatus.NORTH_FINISHED;
-        return GameStatus.IN_PROGRESS;
+            return KalahahStatus.NORTH_FINISHED;
+        return KalahahStatus.IN_PROGRESS;
     }
 
     public boolean isValidToPickStonesFromPit(final Integer pitId, final Player turn) {
@@ -142,6 +151,10 @@ public class Kalahah {
         return this.status.get(pitId) > 0;
     }
 
+    private boolean isEmptyPit(final Integer pitId) {
+        return this.status.get(pitId) == 0;
+    }
+
     private boolean isLastStonePlacedOnKalah(final Integer pitId, final Player turn) {
         if (turn == Player.SOUTH)
             return pitId == KALAH_PLAYER_SOUTH;
@@ -150,7 +163,7 @@ public class Kalahah {
         return false;
     }
 
-    private void processEmptyPitToPullOpponentStones(final Integer pitId, final Player turn) {
+    private void processLastStoneNEmptyPitToPullOpponentStones(final Integer pitId, final Player turn) {
         switch (turn) {
             case SOUTH:
                 if (pitId >= 1 && pitId <= 6) {
@@ -180,4 +193,5 @@ public class Kalahah {
             }
         }
     }
+
 }
