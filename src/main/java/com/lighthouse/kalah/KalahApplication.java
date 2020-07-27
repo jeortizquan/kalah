@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Import;
 
 @SpringBootApplication
-@Import(KalahConfiguration.class)
+@Import({KalahConfiguration.class})
 public class KalahApplication {
 
 	public static void main(String[] args) {
