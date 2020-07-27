@@ -3,6 +3,12 @@ package com.lighthouse.kalah.game;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
+/***
+ * This class contains the Kalahah Board game logic
+ *
+ * @author Jorge Ortiz
+ * @since July 2020
+ */
 public class Kalahah {
 
     public static final Integer KALAH_PLAYER_SOUTH = 7;
@@ -96,10 +102,19 @@ public class Kalahah {
                     throw new RuntimeException("Pit doesn't have items");
                 }
             } else {
-                throw new IllegalArgumentException("Invalid pitId: " + pitId+ " this is a Kalahah");
+                throw new IllegalArgumentException("Invalid pitId: " + pitId + " this is a Kalahah");
             }
         } else {
-            throw new RuntimeException("Game has ended, no more moves!");
+            int south = this.status.get(7);
+            int north = this.status.get(14);
+            String msg = "Player ";
+            if (south > north)
+                msg += " South win!";
+            else if (south < north)
+                msg += " North win!";
+            else if (south == north)
+                msg += "s are in a tie game";
+            throw new RuntimeException("Game has ended, no more moves! " + msg);
         }
     }
 

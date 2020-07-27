@@ -16,12 +16,12 @@ import java.net.URI;
 import java.time.LocalDateTime;
 
 @RestController
-public class GameController {
+public class KalahController {
 
-    public static final Logger logger = LoggerFactory.getLogger(GameController.class);
+    public static final Logger logger = LoggerFactory.getLogger(KalahController.class);
 
     @Autowired
-    private Game controller;
+    private Game service;
 
     @Autowired
     private Gson gson;
@@ -36,7 +36,7 @@ public class GameController {
         ResponseEntity<Object> responseEntity;
 
         try {
-            int gameId = controller.create();
+            int gameId = service.create();
             URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                     .path("/{id}")
                     .buildAndExpand(gameId)
@@ -71,7 +71,7 @@ public class GameController {
         ResponseEntity<Object> responseEntity;
 
         try {
-            Kalahah board = controller.move(gameId, pitId);
+            Kalahah board = service.move(gameId, pitId);
             URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
                     .path("/games/{gameId}")
                     .buildAndExpand(gameId)

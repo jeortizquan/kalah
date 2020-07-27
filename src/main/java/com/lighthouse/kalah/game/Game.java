@@ -13,6 +13,10 @@ public class Game {
         this.games = gameList;
     }
 
+    /**
+     * Creates a board game and places in the game list.
+     * @return Integer Id of the Game
+     */
     public Integer create() {
         Kalahah board = new Kalahah(STONES_LIMIT);
         int attempt = 0;
@@ -24,10 +28,21 @@ public class Game {
         return board.getGameId();
     }
 
+    /**
+     * Checks if a board game already exists in the game list.
+     * @param gameId
+     * @return boolean, true = exists, false = don't
+     */
     private boolean exists(Integer gameId) {
         return this.games.get(gameId) != null;
     }
 
+    /**
+     * Moves the stones according to game rules.
+     * @param gameId
+     * @param pitId
+     * @return Kalahah board object with the correspondent move
+     */
     public Kalahah move(Integer gameId, Integer pitId) {
         if (exists(gameId)) {
             Kalahah board = this.games.get(gameId);
