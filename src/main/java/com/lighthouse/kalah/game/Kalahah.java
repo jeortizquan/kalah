@@ -118,8 +118,8 @@ public class Kalahah {
         }
     }
 
-    private void moveRemainingStonesToKalah(Integer pitId) {
-        if (pitId == KALAH_PLAYER_NORTH) {
+    private void moveRemainingStonesToKalah(final Integer pitId) {
+        if (pitId.equals(KALAH_PLAYER_NORTH)) {
             int northStones = 0;
             //pickup the stones
             for (int n = 8; n <= 13; n++) {
@@ -128,7 +128,7 @@ public class Kalahah {
             }
             this.status.put(KALAH_PLAYER_NORTH, this.status.get(KALAH_PLAYER_NORTH) + northStones);
 
-        } else if (pitId == KALAH_PLAYER_SOUTH) {
+        } else if (pitId.equals(KALAH_PLAYER_SOUTH)) {
             int southStones = 0;
             //pickup the stones
             for (int s = 1; s <= 6; s++) {
@@ -154,46 +154,46 @@ public class Kalahah {
     }
 
     public boolean isValidToPickStonesFromPit(final Integer pitId, final Player turn) {
-        return (turn.equals(Player.SOUTH) && pitId >= 1 && pitId <= 6) ||
-                (turn.equals(Player.NORTH) && pitId >= 8 && pitId <= 13);
+        return (turn.equals(Player.SOUTH) && pitId.intValue() >= 1 && pitId.intValue() <= 6) ||
+                (turn.equals(Player.NORTH) && pitId.intValue() >= 8 && pitId.intValue() <= 13);
     }
 
     public boolean isValidPit(final Integer pitId) {
-        return pitId != KALAH_PLAYER_SOUTH && pitId != KALAH_PLAYER_NORTH;
+        return !pitId.equals(KALAH_PLAYER_SOUTH) && !pitId.equals(KALAH_PLAYER_NORTH);
     }
 
     private boolean pitHasItems(final Integer pitId) {
-        return this.status.get(pitId) > 0;
+        return this.status.get(pitId).intValue() > 0;
     }
 
     private boolean isEmptyPit(final Integer pitId) {
-        return this.status.get(pitId) == 0;
+        return this.status.get(pitId).equals(0);
     }
 
     private boolean isLastStonePlacedOnKalah(final Integer pitId, final Player turn) {
         if (turn == Player.SOUTH)
-            return pitId == KALAH_PLAYER_SOUTH;
+            return pitId.equals(KALAH_PLAYER_SOUTH);
         if (turn == Player.NORTH)
-            return pitId == KALAH_PLAYER_NORTH;
+            return pitId.equals(KALAH_PLAYER_NORTH);
         return false;
     }
 
     private void processLastStoneNEmptyPitToPullOpponentStones(final Integer pitId, final Player turn) {
         switch (turn) {
             case SOUTH:
-                if (pitId >= 1 && pitId <= 6) {
-                    this.status.put(KALAH_PLAYER_SOUTH, this.status.get(KALAH_PLAYER_SOUTH) + this.status.get(14 - pitId) + 1);
+                if (pitId.intValue() >= 1 && pitId.intValue() <= 6) {
+                    this.status.put(KALAH_PLAYER_SOUTH, this.status.get(KALAH_PLAYER_SOUTH) + this.status.get(14 - pitId.intValue()) + 1);
                     //clear the pits
-                    this.status.put(14 - pitId, 0);
-                    this.status.put(pitId, 0);
+                    this.status.put(14 - pitId.intValue(), 0);
+                    this.status.put(pitId.intValue(), 0);
                 }
                 break;
             case NORTH:
-                if (pitId >= 8 && pitId <= 13) {
-                    this.status.put(KALAH_PLAYER_NORTH, this.status.get(KALAH_PLAYER_NORTH) + this.status.get(14 - pitId) + 1);
+                if (pitId.intValue() >= 8 && pitId.intValue() <= 13) {
+                    this.status.put(KALAH_PLAYER_NORTH, this.status.get(KALAH_PLAYER_NORTH) + this.status.get(14 - pitId.intValue()) + 1);
                     //clear the pits
-                    this.status.put(14 - pitId, 0);
-                    this.status.put(pitId, 0);
+                    this.status.put(14 - pitId.intValue(), 0);
+                    this.status.put(pitId.intValue(), 0);
                 }
                 break;
         }
